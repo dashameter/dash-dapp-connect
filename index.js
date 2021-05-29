@@ -1,5 +1,8 @@
+/* eslint-disable no-underscore-dangle */
 import LocalMessageDuplexStream from 'post-message-stream';
 
+/* utils */
+const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 class DashDappConnect {
   constructor() {
     try {
@@ -13,155 +16,64 @@ class DashDappConnect {
     }
   }
 
-  connect() {
-    console.log('DDC connecting');
-    this.pageStream.write({ name: 'connect', payload: null });
+  _promiseWrapper(name, payload) {
+    console.log('dash-dapp-connect: sending', name, payload);
 
-    const that = this;
+    this.pageStream.write({
+      name,
+      payload,
+    });
 
     return new Promise((resolve) => {
-      that.pageStream.on('data', async (data) => {
-        if (data.name === 'onConnect' && data.payload != null) {
-          console.log('promise event data', data);
+      const capName = `on${capitalize(name)}`;
+
+      this.pageStream.on('data', async (data) => {
+        if (data.name === capName && data.payload != null) {
+          console.log('dash-dapp-connect receiving', capName, data);
           resolve(data);
         }
       });
     });
   }
 
-  broadcast({ typeLocator, document }) {
-    console.log('DDC broadcast', typeLocator, document);
+  connect() {
+    return this._promiseWrapper.call(this, 'connect', null);
+  }
 
-    this.pageStream.write({
-      name: 'broadcastDocument',
-      payload: { typeLocator, document },
-    });
+  broadcastDocument(payload) {
+    return this._promiseWrapper.call(this, 'broadcastDocument', payload);
+  }
 
-    const that = this;
+  broadcastDocumentBatch(payload) {
+    return this._promiseWrapper.call(this, 'broadcastDocumentBatch', payload);
+  }
 
-    return new Promise((resolve) => {
-      that.pageStream.on('data', async (data) => {
-        if (data.name === 'onBroadcastDocument') {
-          console.log('promise event data', data);
-          resolve(data);
-        }
-      });
-    });
+  createDocument(payload) {
+    return this._promiseWrapper.call(this, 'createDocument', payload);
   }
 
   getConfirmedBalance() {
-    console.log('DDC getConfirmedBalance');
-
-    this.pageStream.write({
-      name: 'getConfirmedBalance',
-    });
-
-    const that = this;
-
-    return new Promise((resolve) => {
-      that.pageStream.on('data', async (data) => {
-        if (data.name === 'onGetConfirmedBalance') {
-          console.log('promise event data', data);
-          resolve(data);
-        }
-      });
-    });
+    return this._promiseWrapper.call(this, 'getConfirmedBalance', null);
   }
 
   getUnusedAddress() {
-    console.log('DDC getUnusedAddress');
-
-    this.pageStream.write({
-      name: 'getUnusedAddress',
-    });
-
-    const that = this;
-
-    return new Promise((resolve) => {
-      that.pageStream.on('data', async (data) => {
-        if (data.name === 'onGetUnusedAddress') {
-          console.log('promise event data', data);
-          resolve(data);
-        }
-      });
-    });
+    return this._promiseWrapper.call(this, 'getUnusedAddress', null);
   }
 
-  signMessage({ message }) {
-    console.log('DDC signMessage', { message });
-
-    this.pageStream.write({
-      name: 'signMessage', payload: { message },
-    });
-
-    const that = this;
-
-    return new Promise((resolve) => {
-      that.pageStream.on('data', async (data) => {
-        if (data.name === 'onSignMessage') {
-          console.log('promise event data', data);
-          resolve(data);
-        }
-      });
-    });
+  signMessage(payload) {
+    return this._promiseWrapper.call(this, 'signMessage', payload);
   }
 
-  verifyMessage({ message, signature, address }) {
-    console.log('DDC verifyMessage', { message, signature, address });
-
-    this.pageStream.write({
-      name: 'verifyMessage', payload: { message, signature, address },
-    });
-
-    const that = this;
-
-    return new Promise((resolve) => {
-      that.pageStream.on('data', async (data) => {
-        if (data.name === 'onVerifyMessage') {
-          console.log('promise event data', data);
-          resolve(data);
-        }
-      });
-    });
+  verifyMessage(payload) {
+    return this._promiseWrapper.call(this, 'verifyMessage', payload);
   }
 
-  encryptForIdentityECIES({ message, identity }) {
-    console.log('DDC encryptForIdentityECIES', { message, identity });
-
-    this.pageStream.write({
-      name: 'encryptForIdentityECIES', payload: { message, identity },
-    });
-
-    const that = this;
-
-    return new Promise((resolve) => {
-      that.pageStream.on('data', async (data) => {
-        console.log('data :>> ', data);
-        if (data.name === 'onEncryptForIdentityECIES') {
-          console.log('promise event data', data);
-          resolve(data);
-        }
-      });
-    });
+  encryptForIdentityECIES(payload) {
+    return this._promiseWrapper.call(this, 'encryptForIdentityECIES', payload);
   }
 
-  decryptForIdentityECIES({ encrypted, identity }) {
-    console.log('DDC decryptForIdentityECIES', { encrypted, identity });
-
-    this.pageStream.write({
-      name: 'decryptForIdentityECIES', payload: { encrypted, identity },
-    });
-
-    const that = this;
-
-    return new Promise((resolve) => {
-      that.pageStream.on('data', async (data) => {
-        if (data.name === 'onDecryptForIdentityECIES') {
-          console.log('promise event data', data);
-          resolve(data);
-        }
-      });
-    });
+  decryptForIdentityECIES(payload) {
+    return this._promiseWrapper.call(this, 'decryptForIdentityECIES', payload);
   }
 }
 
