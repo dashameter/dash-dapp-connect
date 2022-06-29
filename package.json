@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Login with Dash",
   "main": "index.js",
+  "type": "module",
   "scripts": {
+    "build": "browserify index.js --standalone dash-dapp-connect > dist/dash-dapp-connect.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "dashameter",
